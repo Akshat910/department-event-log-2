@@ -1,0 +1,16 @@
+{
+  "name": "academic-architect",
+  "version": "1.0.0",
+  "description": "Academic Architect — Department Event Log Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "express-session": "^1.18.1",
+    "sql.js": "^1.11.0"
+  }
+}

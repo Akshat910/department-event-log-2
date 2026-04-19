@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Academic Architect — Department Event Log Management System for academic institutions">
+  <title>Academic Architect | Dept. Database</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div id="app" class="app-layout">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span class="logo-icon material-icons-outlined">school</span>
+          <div class="logo-text">
+            <span class="logo-title">e-Events</span>
+            <span class="logo-subtitle">Dept. Database</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#/events" class="nav-item active" data-page="events" id="nav-events">
+          <span class="material-icons-outlined">event_note</span>
+          <span>Event Logs</span>
+        </a>
+        <a href="#/sql-editor" class="nav-item" data-page="sql-editor" id="nav-sql-editor">
+          <span class="material-icons-outlined">terminal</span>
+          <span>SQL Editor</span>
+        </a>
+        <a href="#/settings" class="nav-item" data-page="settings" id="nav-settings">
+          <span class="material-icons-outlined">settings</span>
+          <span>Settings</span>
+        </a>
+        <a href="#/add-record" class="nav-item" data-page="add-record" id="nav-add-record">
+          <span class="material-icons-outlined">add_circle</span>
+          <span>Add Record</span>
+        </a>
+      </nav>
+      <div class="sidebar-section-label">Knowledge Orchestrator</div>
+      <nav class="sidebar-nav secondary">
+        <a href="#/events" class="nav-item" id="nav-query-history">
+          <span class="material-icons-outlined">history</span>
+          <span>Query History</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-documentation">
+          <span class="material-icons-outlined">description</span>
+          <span>Documentation</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn-new-entry" id="btn-new-entry">
+          <span class="material-icons-outlined">add</span>
+          <span>New Entry</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header id="main-header" class="main-header">
+        <div class="header-left">
+          <h1 id="page-title" class="header-title">Event Logs</h1>
+        </div>
+        <div class="header-right">
+          <div class="search-bar" id="global-search">
+            <span class="material-icons-outlined">search</span>
+            <input type="text" placeholder="Search events, queries, settings..." id="search-input">
+          </div>
+          <button class="header-icon-btn" id="btn-notifications">
+            <span class="material-icons-outlined">notifications</span>
+            <span class="notification-dot"></span>
+          </button>
+          <div class="user-avatar" id="user-menu">
+            <span class="material-icons-outlined">account_circle</span>
+            <span class="user-name" id="user-display-name">Admin</span>
+            <div class="user-dropdown" id="user-dropdown">
+              <div class="dropdown-user-info">
+                <span class="material-icons-outlined">person</span>
+                <div>
+                  <div class="dropdown-name" id="dropdown-name">Dr. Sarah Chen</div>
+                  <div class="dropdown-role" id="dropdown-role">Administrator</div>
+                </div>
+              </div>
+              <hr class="dropdown-divider">
+              <button class="dropdown-item" id="btn-logout">
+                <span class="material-icons-outlined">logout</span>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Container -->
+      <div id="page-content" class="page-content">
+        <!-- Dynamic page content loaded here -->
+      </div>
+
+      <!-- Footer -->
+      <footer class="main-footer">
+        <div class="footer-left">
+          <span class="system-badge">
+            <span class="status-dot live"></span>
+            System Live
+          </span>
+          <span class="version-badge">v4.2.1</span>
+        </div>
+        <div class="footer-right">
+          <a href="#">Privacy Policy</a>
+          <a href="#">API Documentation</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- New Entry Modal -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal" id="new-entry-modal">
+      <div class="modal-header">
+        <h2>New Event Log Entry</h2>
+        <button class="modal-close" id="modal-close">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="entry-type">Event Type</label>
+          <select id="entry-type" class="form-select">
+            <option value="SCHEMA_UPDATE">Schema Update</option>
+            <option value="USER_AUTH">User Authentication</option>
+            <option value="DATA_EXPORT">Data Export</option>
+            <option value="BACKUP">Backup</option>
+            <option value="QUERY">Query</option>
+            <option value="DATA_ERROR">Data Error</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="entry-description">Description</label>
+          <textarea id="entry-description" class="form-textarea" rows="4"
+            placeholder="Describe the event..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="entry-status">Status</label>
+          <select id="entry-status" class="form-select">
+            <option value="success">Success</option>
+            <option value="processing">Processing</option>
+            <option value="warning">Warning</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-tertiary" id="modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="modal-submit">Create Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/events.js"></script>
+  <script src="/js/sql-editor.js"></script>
+  <script src="/js/settings.js"></script>
+  <script src="/js/add-record.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+
+</html>
