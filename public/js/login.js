@@ -11,7 +11,7 @@ const LoginPage = {
           <div class="login-logo">
             <span class="logo-icon material-icons-outlined">school</span>
             <div class="logo-text">
-              <span class="logo-title">Academic Architect</span>
+              <span class="logo-title">e-Events</span>
               <span class="logo-subtitle">Dept. Database</span>
             </div>
           </div>
