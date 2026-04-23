@@ -69,6 +69,10 @@ LIMIT 20;</textarea>
                 <span class="material-icons-outlined" style="font-size: 0.875rem">download</span>
                 Export CSV
               </button>
+              <button class="btn btn-sm btn-secondary" id="btn-expand-results" disabled title="Expand results">
+                <span class="material-icons-outlined" style="font-size: 0.875rem">open_in_full</span>
+                Expand
+              </button>
             </div>
           </div>
           <div class="results-table-wrapper" id="results-wrapper">
@@ -90,6 +94,7 @@ LIMIT 20;</textarea>
     const formatBtn = document.getElementById('btn-format-sql');
     const saveBtn = document.getElementById('btn-save-query');
     const exportBtn = document.getElementById('btn-export-csv');
+    const expandBtn = document.getElementById('btn-expand-results');
     const textarea = document.getElementById('sql-input');
     const refreshBtn = document.getElementById('btn-refresh-schema');
 
@@ -97,6 +102,7 @@ LIMIT 20;</textarea>
     formatBtn.addEventListener('click', () => this.formatSQL());
     saveBtn.addEventListener('click', () => App.toast('Query saved to history', 'success'));
     exportBtn.addEventListener('click', () => this.exportCSV());
+    expandBtn.addEventListener('click', () => this.openResultsModal());
     refreshBtn.addEventListener('click', () => this.loadSchema());
 
     // Ctrl+Enter to run
@@ -164,6 +170,7 @@ LIMIT 20;</textarea>
       // SELECT results
       resultsCount.textContent = `${data.rowCount} Rows Found`;
       document.getElementById('btn-export-csv').disabled = false;
+      document.getElementById('btn-expand-results').disabled = false;
       this._lastResult = data;
 
       if (data.rows.length === 0) {
@@ -175,20 +182,7 @@ LIMIT 20;</textarea>
         return;
       }
 
-      resultsWrapper.innerHTML = `
-        <table class="data-table" id="results-table">
-          <thead>
-            <tr>${data.columns.map(col => `<th>${col}</th>`).join('')}</tr>
-          </thead>
-          <tbody>
-            ${data.rows.map((row, i) => `
-              <tr style="animation: fade-in 0.2s ${i * 0.02}s both">
-                ${row.map(cell => `<td>${cell !== null ? cell : '<span style="color:var(--outline)">NULL</span>'}</td>`).join('')}
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
+      resultsWrapper.innerHTML = this._buildTableHTML(data);
 
       App.toast(`Query executed — ${data.rowCount} rows returned`, 'success');
     } catch (err) {
@@ -237,6 +231,73 @@ LIMIT 20;</textarea>
   toggleTable(header) {
     const columns = header.nextElementSibling;
     columns.classList.toggle('open');
+  },
+
+  _buildTableHTML(data) {
+    return `
+      <table class="data-table" id="results-table">
+        <thead>
+          <tr>${data.columns.map(col => `<th>${col}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${data.rows.map((row, i) => `
+            <tr style="animation: fade-in 0.2s ${i * 0.02}s both">
+              ${row.map(cell => `<td>${cell !== null ? cell : '<span style="color:var(--outline)">NULL</span>'}</td>`).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  openResultsModal() {
+    if (!this._lastResult || !this._lastResult.rows.length) {
+      App.toast('No results to expand', 'warning');
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'results-modal-overlay';
+    overlay.className = 'results-modal-overlay';
+    overlay.innerHTML = `
+      <div class="results-modal">
+        <div class="results-modal-header">
+          <div class="results-modal-title">
+            <span class="material-icons-outlined">table_chart</span>
+            Query Results
+            <span class="results-modal-badge">${this._lastResult.rowCount} rows · ${this._lastResult.columns.length} columns</span>
+          </div>
+          <div style="display:flex; gap: var(--space-2);">
+            <button class="btn btn-sm btn-secondary" id="btn-modal-export-csv">
+              <span class="material-icons-outlined" style="font-size: 0.875rem">download</span>
+              Export CSV
+            </button>
+            <button class="btn-icon" id="btn-close-results-modal" title="Close">
+              <span class="material-icons-outlined">close</span>
+            </button>
+          </div>
+        </div>
+        <div class="results-modal-body">
+          ${this._buildTableHTML(this._lastResult)}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    // Animate in
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const close = () => {
+      overlay.classList.remove('open');
+      overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    };
+
+    document.getElementById('btn-close-results-modal').addEventListener('click', close);
+    document.getElementById('btn-modal-export-csv').addEventListener('click', () => this.exportCSV());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function escHandler(e) {
+      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
+    });
   },
 
   formatSQL() {
